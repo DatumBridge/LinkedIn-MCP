@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: linkedin-mcp-main-config
+  namespace: mcp-tools
+data:
+  PORT: "8000"
+  LOG_LEVEL: "INFO"
+  # Set to "1" for browser Test UI / OAuth connect (local/OrbStack only).
+  LINKEDIN_ENABLE_OAUTH_UI: "1"
+  LINKEDIN_MAX_IMAGE_BYTES: "8388608"
+  LINKEDIN_MAX_TEXT_CHARS: "3000"
+  LINKEDIN_HTTP_TIMEOUT_SEC: "30"
+  LINKEDIN_CREATE_RATE_LIMIT: "10"
+  LINKEDIN_CREATE_RATE_WINDOW_SEC: "3600"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: linkedin-mcp-main
+  namespace: mcp-tools
+  labels:
+    app: linkedin-mcp-main
+spec:
+  type: NodePort
+  selector:
+    app: linkedin-mcp-main
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: linkedin-mcp-main
+  namespace: mcp-tools
+  labels:
+    app: linkedin-mcp-main
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: linkedin-mcp-main
+  template:
+    metadata:
+      labels:
+        app: linkedin-mcp-main
+    spec:
+      containers:
+        - name: tool
+          # Overridden by k8s-deploy.sh; local OrbStack default:
+          image: linkedin-mcp:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: linkedin-mcp-main-config
+            - secretRef:
+                name: linkedin-mcp-main-secret
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

@@ -30,6 +30,7 @@ from app.schemas.mcp_models import (
     ProfileResponse,
 )
 from app.services.linkedin_service import LinkedInService
+from app.capability_bind import bind_declared_capabilities
 
 logger = logging.getLogger(__name__)
 
@@ -369,6 +370,9 @@ Outputs: success
 
 
 # ============== HTTP App with Health Endpoint ==============
+
+
+bind_declared_capabilities(mcp)
 
 _base_app = mcp.http_app()
 

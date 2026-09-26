@@ -122,7 +122,11 @@ def get_me(
     credentials_path: Optional[str] = _CREDS_PATH_FIELD,
     credentials_json: Optional[str] = _CREDS_JSON_FIELD,
 ) -> ProfileResponse:
-    """Get the authenticated LinkedIn member profile (untrusted external content)."""
+    """Get the authenticated LinkedIn member profile (untrusted external content).
+
+        Capabilities: linkedin.get_me
+Outputs: success
+        """
     logger.info("MCP: get_me")
     try:
         if not credentials_path and not credentials_json:
@@ -140,6 +144,7 @@ def create_post(
     text: str = Field(
         default="",
         description="Post commentary text (required unless article_url is set)",
+    json_schema_extra={"x-datumbridge-encoding": "plain"}
     ),
     credentials_path: Optional[str] = _CREDS_PATH_FIELD,
     credentials_json: Optional[str] = _CREDS_JSON_FIELD,
@@ -172,7 +177,11 @@ def create_post(
         description="If true, return the request payload without calling LinkedIn",
     ),
 ) -> CreatePostResponse:
-    """Create a personal LinkedIn feed post (text and/or article URL). Requires confirm=true."""
+    """Create a personal LinkedIn feed post (text and/or article URL). Requires confirm=true.
+
+        Capabilities: linkedin.create_post
+Outputs: success
+        """
     logger.info(
         "MCP: create_post visibility=%s dry_run=%s confirm=%s",
         visibility,
@@ -223,8 +232,9 @@ def create_image_post(
     image_base64: str = Field(
         ...,
         description="Image bytes encoded as base64 (size gated by LINKEDIN_MAX_IMAGE_BYTES)",
+    json_schema_extra={"x-datumbridge-encoding": "base64"}
     ),
-    text: str = Field(default="", description="Post commentary text"),
+    text: str = Field(default="", description="Post commentary text", json_schema_extra={"x-datumbridge-encoding": "plain"}),
     credentials_path: Optional[str] = _CREDS_PATH_FIELD,
     credentials_json: Optional[str] = _CREDS_JSON_FIELD,
     image_media_type: str = Field(
@@ -248,7 +258,11 @@ def create_image_post(
         description="If true, validate and return metadata without uploading/publishing",
     ),
 ) -> CreatePostResponse:
-    """Create a personal LinkedIn feed post with an image. Requires confirm=true."""
+    """Create a personal LinkedIn feed post with an image. Requires confirm=true.
+
+        Capabilities: linkedin.create_image_post
+Outputs: success
+        """
     logger.info(
         "MCP: create_image_post visibility=%s dry_run=%s confirm=%s",
         visibility,
@@ -301,7 +315,11 @@ def get_post(
     credentials_path: Optional[str] = _CREDS_PATH_FIELD,
     credentials_json: Optional[str] = _CREDS_JSON_FIELD,
 ) -> PostResponse:
-    """Fetch a LinkedIn UGC post by URN (untrusted external content)."""
+    """Fetch a LinkedIn UGC post by URN (untrusted external content).
+
+        Capabilities: linkedin.get_post
+Outputs: success
+        """
     logger.info("MCP: get_post")
     try:
         if not credentials_path and not credentials_json:
@@ -327,7 +345,11 @@ def delete_post(
         description="Must be true to delete (side effect)",
     ),
 ) -> ActionResponse:
-    """Delete a LinkedIn UGC post by URN. Requires confirm=true."""
+    """Delete a LinkedIn UGC post by URN. Requires confirm=true.
+
+        Capabilities: linkedin.delete_post
+Outputs: success
+        """
     logger.info("MCP: delete_post confirm=%s", confirm)
     try:
         if not credentials_path and not credentials_json:

@@ -11,3 +11,5 @@ token.json
 !requirements_mcp.txt
 docs
 scripts/__pycache__
+!registry_docs/
+!registry_docs/*.md
